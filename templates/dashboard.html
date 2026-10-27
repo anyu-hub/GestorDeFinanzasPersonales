@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Panel · Finanzas claras{% endblock %}
+{% block content %}
+<section class="dashboard-heading">
+  <div>
+    <p class="eyebrow">{{ month_name }} · {{ model.name }}</p>
+    <h1>Hola, {{ g.user.display_name }}</h1>
+    <p>Resumen de tus movimientos registrados durante el mes actual.</p>
+  </div>
+  <a class="button" href="{{ url_for('transactions.new_transaction') }}">＋ Registrar movimiento</a>
+</section>
+<section class="summary-grid" aria-label="Resumen del mes">
+  <article class="summary-card">
+    <span>Balance del mes</span>
+    <strong>{{ balance|money }}</strong>
+    <small>Ingresos menos gastos registrados este mes</small>
+  </article>
+  <article class="summary-card">
+    <span>Ingresos</span>
+    <strong>{{ income|money }}</strong>
+    <small>Desde el primer día del mes</small>
+  </article>
+  <article class="summary-card">
+    <span>Gastos del mes</span>
+    <strong>{{ expenses|money }}</strong>
+    <small>Mes anterior: {{ previous_expenses|money }}</small>
+  </article>
+</section>
+<section class="content-card chart-card">
+  <div>
+    <p class="eyebrow">Distribución de gastos</p>
+    <h2>Gastos por categoría</h2>
+  </div>
+  {% if chart_rows %}
+    <svg class="expense-chart" viewBox="0 0 640 {{ chart_rows|length * 54 + 12 }}" role="img"
+         aria-label="Gráfica de gastos por categoría en dólares">
+      {% for item in chart_rows %}
+        <text x="0" y="{{ loop.index0 * 54 + 20 }}">{{ item.name }}</text>
+        <rect x="0" y="{{ loop.index0 * 54 + 27 }}" width="{{ item.width * 5.2 }}" height="16" rx="8"></rect>
+        <text x="{{ item.width * 5.2 + 10 }}" y="{{ loop.index0 * 54 + 41 }}">{{ item.amount|money }}</text>
+      {% endfor %}
+    </svg>
+  {% else %}
+    <p>Aún no hay gastos este mes. Registra un movimiento para ver la distribución.</p>
+  {% endif %}
+</section>
+{% endblock %}

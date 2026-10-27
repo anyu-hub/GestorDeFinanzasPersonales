@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Crear cuenta · Finanzas claras{% endblock %}
+{% block content %}
+<section class="auth-card">
+  <p class="eyebrow">Empieza aquí</p>
+  <h1>Crea tu cuenta</h1>
+  <p>Después responderás tres preguntas para recibir una sugerencia de método.</p>
+  <form method="post" class="stack">
+    <label>Nombre
+      <input name="display_name" autocomplete="name" required maxlength="80">
+    </label>
+    <label>Correo electrónico
+      <input type="email" name="email" autocomplete="email" required maxlength="254">
+    </label>
+    <label>Contraseña (mínimo 8 caracteres)
+      <input type="password" name="password" autocomplete="new-password" minlength="8" required>
+    </label>
+    <button class="button" type="submit">Crear cuenta</button>
+  </form>
+  <p>¿Ya tienes cuenta? <a href="{{ url_for('auth.login') }}">Inicia sesión</a>.</p>
+</section>
+{% endblock %}

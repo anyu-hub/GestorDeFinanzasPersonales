@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Movimientos · Finanzas claras{% endblock %}
+{% block content %}
+<section>
+  <p class="eyebrow">Historial</p>
+  <h1>Movimientos</h1>
+  <form method="get" class="filter-form">
+    <label>Desde <input type="date" name="start_date" value="{{ start_date }}"></label>
+    <label>Hasta <input type="date" name="end_date" value="{{ end_date }}"></label>
+    <label>Categoría
+      <select name="category_id">
+        <option value="">Todas</option>
+        {% for category in categories %}
+          <option value="{{ category.id }}" {% if category_id == category.id|string %}selected{% endif %}>
+            {{ category.name }} ({{ "ingreso" if category.transaction_type == "income" else "gasto" }})
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <button class="button" type="submit">Filtrar</button>
+    <a class="button button-secondary" href="{{ url_for('transactions.history') }}">Limpiar</a>
+  </form>
+</section>
+<section class="content-card table-wrap">
+  {% if transactions %}
+    <table>
+      <thead><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Descripción</th><th class="amount">Monto</th></tr></thead>
+      <tbody>
+      {% for transaction in transactions %}
+        <tr>
+          <td>{{ transaction.transaction_date }}</td>
+          <td><span class="type-pill type-{{ transaction.transaction_type }}">{{ "Ingreso" if transaction.transaction_type == "income" else "Gasto" }}</span></td>
+          <td>{{ transaction.category_name }}</td>
+          <td>{{ transaction.description or "—" }}</td>
+          <td class="amount">{{ transaction.amount_cents|money }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No hay movimientos que coincidan con los filtros.</p>
+  {% endif %}
+</section>
+{% endblock %}

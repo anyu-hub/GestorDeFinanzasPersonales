@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Cuestionario inicial · Finanzas claras{% endblock %}
+{% block content %}
+<section class="content-card">
+  <p class="eyebrow">Configuración · 3 preguntas</p>
+  <h1>¿Cómo prefieres organizar tu dinero?</h1>
+  <p>Usaremos tus respuestas para sugerir un método. La recomendación es orientativa y podrás cambiarla.</p>
+  <form method="post" class="stack">
+    {% for field, question in [
+      ('budgeting_style', '¿Qué tipo de planificación te resulta más cómoda?'),
+      ('income_stability', '¿Cómo suele ser tu ingreso mensual?'),
+      ('savings_priority', '¿Qué lugar quieres dar al ahorro?')
+    ] %}
+      <fieldset>
+        <legend>{{ question }}</legend>
+        {% for value, label in options[field].items() %}
+          <label class="choice">
+            <input type="radio" name="{{ field }}" value="{{ value }}" required>
+            <span>{{ label }}</span>
+          </label>
+        {% endfor %}
+      </fieldset>
+    {% endfor %}
+    <button class="button" type="submit">Ver mi recomendación</button>
+  </form>
+</section>
+{% endblock %}
