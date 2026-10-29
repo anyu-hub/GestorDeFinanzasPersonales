@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Elegir método · Finanzas claras{% endblock %}
+{% block content %}
+<section>
+  <p class="eyebrow">Tu configuración</p>
+  <h1>Elige tu método financiero</h1>
+  <p>Las categorías para registrar movimientos se ajustarán al método seleccionado.</p>
+  {% if current_model %}
+    <p class="notice">Para conservar la consistencia del historial, el método no se puede cambiar después de registrar movimientos.</p>
+  {% endif %}
+  <form method="post" class="model-grid">
+    {% for model in models %}
+      <label class="model-card {% if current_model and current_model.code == model.code %}selected{% endif %}">
+        <input type="radio" name="model_code" value="{{ model.code }}" required
+          {% if current_model and current_model.code == model.code %}checked{% endif %}>
+        <span class="model-name">{{ model.name }}</span>
+        <span>{{ explanations[model.code] }}</span>
+      </label>
+    {% endfor %}
+    <button class="button" type="submit">Guardar método</button>
+  </form>
+</section>
+{% endblock %}

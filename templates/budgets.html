@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Presupuestos · Finanzas claras{% endblock %}
+{% block content %}
+<section class="content-card">
+  <p class="eyebrow">Límites mensuales</p>
+  <h1>Presupuestos por categoría</h1>
+  <p>Define un límite de gasto para cada categoría. Al acercarte al 80% o superarlo, el panel mostrará un indicador visual.</p>
+  <form method="post" class="stack planning-form">
+    <label>Categoría de gasto
+      <select name="category_id" required>
+        <option value="">Selecciona una categoría</option>
+        {% for category in categories %}
+          <option value="{{ category.id }}">{{ category.group_name }} · {{ category.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Límite mensual (USD)
+      <input type="number" name="amount" min="0.01" max="9999999999.99" step="0.01" required>
+    </label>
+    <button class="button" type="submit">Guardar límite</button>
+  </form>
+</section>
+<section class="content-card planning-card">
+  <h2>Límites actuales</h2>
+  {% if budget_rows %}
+    <div class="budget-list">
+      {% for budget in budget_rows %}
+        <article class="budget-item">
+          <div class="section-heading">
+            <span><strong>{{ budget.name }}</strong><small>{{ budget.group_name }}</small></span>
+            <strong>{{ budget.amount_cents|money }}</strong>
+          </div>
+          <form method="post" action="{{ url_for('planning.delete_budget', budget_id=budget.id) }}">
+            <button class="button button-secondary" type="submit">Eliminar límite</button>
+          </form>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No tienes límites configurados.</p>
+  {% endif %}
+</section>
+{% endblock %}

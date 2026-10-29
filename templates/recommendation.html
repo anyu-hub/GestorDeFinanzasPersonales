@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Tu recomendación · Finanzas claras{% endblock %}
+{% block content %}
+<section class="content-card">
+  <p class="eyebrow">Tu recomendación</p>
+  <h1>{{ recommendation.name }}</h1>
+  <p class="lead">{{ recommendation.description }}</p>
+  <p>La recomendación se basa en tus respuestas sobre planificación, estabilidad del ingreso y prioridad del ahorro. Puedes aceptarla o elegir otro método.</p>
+  <div class="actions">
+    <form method="post">
+      <button class="button" name="choice" value="accept" type="submit">Aceptar recomendación</button>
+    </form>
+    <form method="post">
+      <button class="button button-secondary" name="choice" value="choose" type="submit">Ver y elegir otro método</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

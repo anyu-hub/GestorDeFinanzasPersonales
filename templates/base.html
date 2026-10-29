@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Finanzas claras{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="{% if g.user and g.user.model_id %}model-{{ g.user.model_id }}{% endif %}">
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('main.index') }}">Finanzas claras</a>
+    {% if g.user %}
+      <nav aria-label="Navegación principal">
+        {% if g.user.model_id %}
+          <a href="{{ url_for('transactions.dashboard') }}">Panel</a>
+          <a href="{{ url_for('transactions.new_transaction') }}">Registrar</a>
+          <a href="{{ url_for('transactions.history') }}">Movimientos</a>
+          <a href="{{ url_for('planning.budgets') }}">Presupuestos</a>
+          <a href="{{ url_for('planning.goals') }}">Metas</a>
+          <a href="{{ url_for('onboarding.choose_model') }}">Método</a>
+        {% endif %}
+        <form class="inline-form" action="{{ url_for('auth.logout') }}" method="post">
+          <button class="link-button" type="submit">Salir</button>
+        </form>
+      </nav>
+    {% endif %}
+  </header>
+  <main class="container">
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+      <div class="notice notice-{{ category }}" role="status">{{ message }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="footer">Registro personal de ingresos y gastos · Montos en USD</footer>
+</body>
+</html>

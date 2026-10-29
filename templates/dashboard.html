@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Panel · Finanzas claras{% endblock %}
+{% block content %}
+<section class="dashboard-heading">
+  <div>
+    <p class="eyebrow">{{ month_name }} · {{ model.name }}</p>
+    <h1>Hola, {{ g.user.display_name }}</h1>
+    <p>Resumen de tus movimientos registrados durante el mes actual.</p>
+  </div>
+  <a class="button" href="{{ url_for('transactions.new_transaction') }}">＋ Registrar movimiento</a>
+</section>
+<section class="summary-grid" aria-label="Resumen del mes">
+  <article class="summary-card">
+    <span>Balance del mes</span>
+    <strong>{{ balance|money }}</strong>
+    <small>Ingresos menos gastos registrados este mes</small>
+  </article>
+  <article class="summary-card">
+    <span>Ingresos</span>
+    <strong>{{ income|money }}</strong>
+    <small>Desde el primer día del mes</small>
+  </article>
+  <article class="summary-card">
+    <span>Gastos del mes</span>
+    <strong>{{ expenses|money }}</strong>
+    <small>Mes anterior: {{ previous_expenses|money }}</small>
+  </article>
+  <article class="summary-card">
+    <span>Balance estimado al cierre</span>
+    <strong>{{ cash_flow.balance_cents|money }}</strong>
+    <small>Ingresos estimados {{ cash_flow.income_cents|money }} · gastos proyectados {{ cash_flow.expenses_cents|money }}</small>
+  </article>
+  <article class="summary-card">
+    <span>Tasa de ahorro estimada</span>
+    <strong>{% if cash_flow.savings_rate is not none %}{{ "%.1f"|format(cash_flow.savings_rate) }}%{% else %}—{% endif %}</strong>
+    <small>Balance estimado respecto a los ingresos estimados</small>
+  </article>
+</section>
+<section class="content-card planning-card">
+  <p class="eyebrow">Proyección mensual</p>
+  <h2>Ingreso recurrente esperado</h2>
+  <p>Indica tu ingreso recurrente mensual total. La proyección lo toma como el ingreso esperado del mes (sin sumar dos veces lo ya registrado) y extrapola los gastos según el ritmo actual.</p>
+  <form method="post" action="{{ url_for('planning.update_cash_flow') }}" class="inline-settings-form">
+    <label>Ingreso mensual esperado (USD)
+      <input type="number" name="monthly_income" min="0" max="9999999999.99" step="0.01"
+        value="{{ '%.2f'|format(cash_flow.expected_income_cents / 100) }}" required>
+    </label>
+    <button class="button" type="submit">Guardar ingreso esperado</button>
+  </form>
+</section>
+<section class="content-card planning-card">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Control mensual</p>
+      <h2>Presupuestos por categoría</h2>
+    </div>
+    <a class="button button-secondary" href="{{ url_for('planning.budgets') }}">Administrar límites</a>
+  </div>
+  {% if budget_indicators %}
+    <div class="budget-list">
+      {% for budget in budget_indicators %}
+        <article class="budget-item budget-{{ budget.status }}">
+          <div class="section-heading">
+            <strong>{{ budget.name }}</strong>
+            <span>{{ budget.spent_cents|money }} de {{ budget.amount_cents|money }} · {{ budget.percent }}%</span>
+          </div>
+          <div class="progress-track" role="progressbar" aria-label="Presupuesto de {{ budget.name }}"
+               aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ budget.bar_percent }}">
+            <span style="width: {{ budget.bar_percent }}%"></span>
+          </div>
+          {% if budget.status == "over" %}
+            <small class="budget-message">Límite mensual superado.</small>
+          {% elif budget.status == "near" %}
+            <small class="budget-message">Estás cerca del límite mensual.</small>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Aún no definiste límites mensuales. Configura un presupuesto por categoría para ver alertas aquí.</p>
+  {% endif %}
+</section>
+<section class="content-card planning-card">
+  <p class="eyebrow">Composición de gastos</p>
+  <h2>Gastos fijos y variables</h2>
+  {% if expenses %}
+    <div class="expense-type-grid">
+      <article>
+        <strong>Fijos · {{ fixed_variable_percent.fixed }}%</strong>
+        <span>{{ fixed_variable.fixed|money }}</span>
+      </article>
+      <article>
+        <strong>Variables · {{ fixed_variable_percent.variable }}%</strong>
+        <span>{{ fixed_variable.variable|money }}</span>
+      </article>
+    </div>
+    <p class="muted-small">Porcentaje calculado sobre los gastos registrados durante el mes.</p>
+  {% else %}
+    <p>Aún no hay gastos registrados este mes.</p>
+  {% endif %}
+</section>
+<section class="content-card chart-card">
+  <div>
+    <p class="eyebrow">Distribución de gastos</p>
+    <h2>Gastos por categoría</h2>
+  </div>
+  {% if chart_rows %}
+    <svg class="expense-chart" viewBox="0 0 640 {{ chart_rows|length * 54 + 12 }}" role="img"
+         aria-label="Gráfica de gastos por categoría en dólares">
+      {% for item in chart_rows %}
+        <text x="0" y="{{ loop.index0 * 54 + 20 }}">{{ item.name }}</text>
+        <rect x="0" y="{{ loop.index0 * 54 + 27 }}" width="{{ item.width * 5.2 }}" height="16" rx="8"></rect>
+        <text x="{{ item.width * 5.2 + 10 }}" y="{{ loop.index0 * 54 + 41 }}">{{ item.amount|money }}</text>
+      {% endfor %}
+    </svg>
+  {% else %}
+    <p>Aún no hay gastos este mes. Registra un movimiento para ver la distribución.</p>
+  {% endif %}
+</section>
+{% endblock %}

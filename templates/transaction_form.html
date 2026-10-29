@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Registrar movimiento · Finanzas claras{% endblock %}
+{% block content %}
+<section class="content-card form-card">
+  <p class="eyebrow">Método activo: {{ model.name }}</p>
+  <h1>Registrar movimiento</h1>
+  <p>Las categorías disponibles corresponden a tu método financiero.</p>
+  <form method="post" class="stack">
+    <label>Tipo
+      <select name="transaction_type" required>
+        <option value="">Selecciona un tipo</option>
+        <option value="income">Ingreso</option>
+        <option value="expense">Gasto</option>
+      </select>
+    </label>
+    <label>Categoría
+      <select name="category_id" required>
+        <option value="">Selecciona una categoría</option>
+        {% for category in categories %}
+          <option value="{{ category.id }}" data-type="{{ category.transaction_type }}">
+            {{ category.group_name }} · {{ category.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Clasificación del gasto
+      <select name="expense_kind">
+        <option value="">Selecciona si es ingreso</option>
+        <option value="fixed">Fijo (obligación recurrente)</option>
+        <option value="variable">Variable (monto o frecuencia cambiante)</option>
+      </select>
+    </label>
+    <label>Monto (USD)
+      <input type="number" name="amount" min="0.01" step="0.01" required>
+    </label>
+    <label>Fecha
+      <input type="date" name="transaction_date" value="{{ today }}" max="{{ today }}" required>
+    </label>
+    <label>Descripción (opcional)
+      <input name="description" maxlength="200">
+    </label>
+    <button class="button" type="submit">Guardar movimiento</button>
+  </form>
+</section>
+<section class="content-card form-card">
+  <h2>Crear una categoría personalizada</h2>
+  <p>Las categorías que crees solo estarán disponibles para ti y para el método activo.</p>
+  <form method="post" action="{{ url_for('transactions.create_category') }}" class="stack">
+    <label>Nombre de la categoría
+      <input name="name" maxlength="60" required>
+    </label>
+    <label>Tipo
+      <select name="transaction_type" required>
+        <option value="">Selecciona un tipo</option>
+        <option value="income">Ingreso</option>
+        <option value="expense">Gasto</option>
+      </select>
+    </label>
+    <button class="button button-secondary" type="submit">Crear categoría</button>
+  </form>
+</section>
+{% endblock %}
