@@ -82,23 +82,68 @@ def recommendation():
 def choose_model():
     if request.method == "POST":
         model_code = request.form.get("model_code", "")
+        if request.form.get("action") == "apply_migration":
+            model_code = request.form.get("target_model_code", "")
+            plan = _category_migration_plan(model_code)
+            if plan is None:
+                return redirect(url_for("onboarding.choose_model"))
+            _target_model, _automatic_mapping, manual_mapping, _sources = plan
+            submitted_mapping = {}
+            try:
+                for item in manual_mapping:
+                    source_id = item["source"]["id"]
+                    submitted_mapping[source_id] = int(
+                        request.form.get(f"category_map_{source_id}", "")
+                    )
+            except ValueError:
+                flash("Selecciona una categoría para cada movimiento pendiente.", "error")
+                return _render_category_migration(model_code, plan)
+
+            if FinanceService.migrate_user_method(
+                get_db(), g.user["id"], model_code, submitted_mapping
+            ):
+                flash("Método cambiado y movimientos conservados.", "success")
+                return redirect(url_for("transactions.dashboard"))
+            flash("Una o más categorías seleccionadas no son válidas.", "error")
+            return _render_category_migration(model_code, plan)
+
         if not any(model["code"] == model_code for model in FINANCIAL_MODELS):
             flash("Selecciona un método disponible.", "error")
-        elif g.user["model_id"] is not None and get_db().execute(
-            "SELECT 1 FROM transactions WHERE user_id = ? LIMIT 1",
-            (g.user["id"],),
-        ).fetchone():
-            flash(
-                "No puedes cambiar de método mientras tengas movimientos registrados.",
-                "error",
-            )
         else:
-            with get_db():
-                FinanceService.set_user_model(get_db(), g.user["id"], model_code)
-            return redirect(url_for("transactions.dashboard"))
+            current_model = FinanceService.model_for_user(get_db(), g.user["id"])
+            if current_model and current_model["code"] == model_code:
+                return redirect(url_for("transactions.dashboard"))
+            plan = _category_migration_plan(model_code)
+            if plan is None:
+                return redirect(url_for("onboarding.choose_model"))
+            _target_model, _automatic_mapping, manual_mapping, _sources = plan
+            if manual_mapping:
+                return _render_category_migration(model_code, plan)
+            if FinanceService.migrate_user_method(get_db(), g.user["id"], model_code):
+                flash("Método cambiado y movimientos conservados.", "success")
+                return redirect(url_for("transactions.dashboard"))
+            flash("No se pudo completar el cambio de método.", "error")
     return render_template(
         "models.html",
         models=FINANCIAL_MODELS,
         explanations=MODEL_EXPLANATIONS,
         current_model=FinanceService.model_for_user(get_db(), g.user["id"]),
+    )
+
+
+def _category_migration_plan(model_code):
+    if not any(model["code"] == model_code for model in FINANCIAL_MODELS):
+        flash("Selecciona un método disponible.", "error")
+        return None
+    return FinanceService.category_migration_plan(get_db(), g.user["id"], model_code)
+
+
+def _render_category_migration(model_code, plan):
+    target_model, automatic_mapping, manual_mapping, _source_categories = plan
+    return render_template(
+        "category_migration.html",
+        target_model=target_model,
+        automatic_mapping_count=len(automatic_mapping),
+        manual_mapping=manual_mapping,
+        model_code=model_code,
     )

@@ -5,6 +5,7 @@
   <p class="eyebrow">Método activo: {{ model.name }}</p>
   <h1>Registrar movimiento</h1>
   <p>Las categorías disponibles corresponden a tu método financiero.</p>
+  <p class="notice">Saldo disponible actual: <strong>{{ available_balance_cents|money }}</strong>. No se aceptan gastos que superen este saldo.</p>
   <form method="post" class="stack">
     <label>Tipo
       <select name="transaction_type" required>

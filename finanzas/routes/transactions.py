@@ -146,6 +146,7 @@ def new_transaction():
         "transaction_form.html",
         categories=categories,
         model=model,
+        available_balance_cents=FinanceService.balance_for_user(get_db(), g.user["id"]),
         today=date.today().isoformat(),
     )
 
@@ -212,8 +213,21 @@ def _save_transaction(categories):
     elif valid_date > date.today():
         flash("La fecha no puede estar en el futuro.", "error")
     else:
-        with get_db():
-            get_db().execute(
+        connection = get_db()
+        with connection:
+            connection.execute("BEGIN IMMEDIATE")
+            available_balance = FinanceService.balance_for_user(connection, g.user["id"])
+            if transaction_type == "expense" and amount_cents > available_balance:
+                connection.rollback()
+                missing_cents = amount_cents - available_balance
+                flash(
+                    "Saldo insuficiente. Disponible: "
+                    f"${Decimal(available_balance) / Decimal(100):,.2f}. Registra primero un ingreso de "
+                    f"al menos ${Decimal(missing_cents) / Decimal(100):,.2f} para mantener el balance en cero o más.",
+                    "error",
+                )
+                return None
+            connection.execute(
                 """INSERT INTO transactions
                    (user_id, category_id, transaction_type, expense_kind, amount_cents,
                     transaction_date, description)

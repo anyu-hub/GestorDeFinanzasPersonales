@@ -6,7 +6,7 @@
   <h1>Elige tu método financiero</h1>
   <p>Las categorías para registrar movimientos se ajustarán al método seleccionado.</p>
   {% if current_model %}
-    <p class="notice">Para conservar la consistencia del historial, el método no se puede cambiar después de registrar movimientos.</p>
+    <p class="notice">Puedes cambiar de método. Tus movimientos y presupuestos se conservarán; las categorías equivalentes se reasignan automáticamente y podrás elegir una categoría cuando no exista una coincidencia.</p>
   {% endif %}
   <form method="post" class="model-grid">
     {% for model in models %}

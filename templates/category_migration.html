@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Adaptar categorías · Finanzas claras{% endblock %}
+{% block content %}
+<section class="content-card">
+  <p class="eyebrow">Cambio de método</p>
+  <h1>Adapta tus categorías</h1>
+  <p>El método nuevo es <strong>{{ target_model.name }}</strong>. Las categorías con el mismo nombre y tipo se reasignarán automáticamente ({{ automatic_mapping_count }} coincidencias).</p>
+  {% if manual_mapping %}
+    <p>Elige una categoría compatible para cada categoría sin equivalente. Se conservarán el monto, la fecha y la descripción de todos tus movimientos.</p>
+    <form method="post" action="{{ url_for('onboarding.choose_model') }}" class="stack">
+      <input type="hidden" name="action" value="apply_migration">
+      <input type="hidden" name="target_model_code" value="{{ model_code }}">
+      {% for item in manual_mapping %}
+        <label>{{ item.source.name }} ({{ "ingreso" if item.source.transaction_type == "income" else "gasto" }})
+          <select name="category_map_{{ item.source.id }}" required>
+            <option value="">Selecciona la nueva categoría</option>
+            {% for option in item.options %}
+              <option value="{{ option.id }}">{{ option.group_name }} · {{ option.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      {% endfor %}
+      <div class="actions">
+        <button class="button" type="submit">Cambiar método y conservar movimientos</button>
+        <a class="button button-secondary" href="{{ url_for('onboarding.choose_model') }}">Cancelar</a>
+      </div>
+    </form>
+  {% else %}
+    <form method="post" action="{{ url_for('onboarding.choose_model') }}">
+      <input type="hidden" name="model_code" value="{{ model_code }}">
+      <button class="button" type="submit">Continuar</button>
+    </form>
+  {% endif %}
+</section>
+{% endblock %}

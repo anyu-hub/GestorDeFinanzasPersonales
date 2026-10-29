@@ -50,13 +50,13 @@ Registro ──> Cuestionario ──> Recomendación ── aceptar ──> Pane
 <<<<<<< HEAD
 El panel presenta ingresos, gastos y balance del mes calendario actual, compara el gasto con el mes anterior y grafica los gastos del mes por categoría con SVG nativo. También estima el balance al cierre extrapolando el gasto observado y comparándolo con el ingreso recurrente mensual esperado que configura cada usuario; de ahí calcula una tasa de ahorro estimada. Los límites de presupuesto son manuales por categoría y el panel advierte al alcanzar el 80% o superar el límite. Cada gasto se clasifica como fijo o variable y el panel compara ambos importes del mes.
 
-La sección de metas permite definir objetivos de ahorro y registrar aportaciones explícitas. Se conserva un historial contable separado de las transacciones; las aportaciones no crean ni modifican movimientos. El historial de movimientos admite filtros por fechas y categoría. Se pueden crear categorías propias desde el formulario de movimientos; quedan disponibles solo para su creador y el método activo. Para mantener consistente el historial, el método queda bloqueado tras guardar el primer movimiento.
+La sección de metas permite definir objetivos de ahorro y registrar aportaciones explícitas. Se conserva un historial contable separado de las transacciones; las aportaciones no crean ni modifican movimientos. El historial de movimientos admite filtros por fechas y categoría. Se pueden crear categorías propias desde el formulario de movimientos; quedan disponibles solo para su creador y el método activo. Los gastos no pueden superar el saldo acumulado de ingresos menos gastos; el formulario informa el saldo disponible y solicita registrar un ingreso cuando no alcanza. El usuario puede cambiar de método conservando movimientos y presupuestos: las categorías equivalentes se reasignan automáticamente y las demás se eligen antes de confirmar.
 
 ### Regla de recomendación
 
 Antes de responder el cuestionario, se muestran las explicaciones de los cuatro métodos financieros. El cuestionario pregunta por estilo de planificación, estabilidad del ingreso y prioridad del ahorro. Cada respuesta suma puntos de manera transparente:
 =======
-El panel presenta ingresos, gastos y balance del mes calendario actual, compara el gasto con el mes anterior y grafica los gastos del mes por categoría con SVG nativo. El historial admite filtros por fechas y categoría. Para mantener consistente el historial, el método queda bloqueado tras guardar el primer movimiento.
+El panel presenta ingresos, gastos y balance del mes calendario actual, compara el gasto con el mes anterior y grafica los gastos del mes por categoría con SVG nativo. El historial admite filtros por fechas y categoría. Los gastos no pueden superar el saldo acumulado de ingresos menos gastos; el formulario informa el saldo disponible y solicita registrar un ingreso cuando no alcanza. El usuario puede cambiar de método conservando movimientos y presupuestos: las categorías equivalentes se reasignan automáticamente y las demás se eligen antes de confirmar.
 
 ### Regla de recomendación
 
